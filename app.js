@@ -125,18 +125,91 @@ app.post('/calculate', (req, res) => {
 
 
  
-function GetTotem(conn) {
- return new Promise(async (resolve, reject)   =>  {
-  try {
-
-    conn.query('SELECT COUNT(*) AS total FROM class1', (err, result) => {
-     return resolve(result[0].total); // return id from here
+app.post('/calculate2', (req, res) => {
+    const mysql = require('mysql2')
+    const connection = mysql.createConnection({
+      host: 'localhost',
+      user: 'aeryus',
+      password: 'root',
+      database: 'prac'
     })
 
-  } catch (err) {
-   reject(err)
+    connection.connect()
+
+  let class1 = req.body.class1;
+
+  class1 = class1.toUpperCase();
+
+  const a = [];
+  const b = [];
+
+  let string = class1.split(" ");
+  console.log(string)
+
+  for (var i = 0; i < string.length; i++) {
+      if(string[i].charAt(1) == "R") {
+        a.push(string[i].replace("DR",""));
+      }
+
+     if(string[i].charAt(1) == "Q") {
+        b.push(string[i].replace("DQ",""));
+      }
   }
- })
-}
+
+   var whereSqlA = "";
+   for (var i = 0; i < a.length; i++) {
+        whereSqlA += a[i].toString()
+        if( i != a.length -1) {
+            whereSqlA += ",";
+        }
+   }
+
+   var whereSqlB = "";
+   for (var i = 0; i < b.length; i++) {
+        whereSqlB += b[i].toString()
+        if( i != b.length -1) {
+            whereSqlB += ",";
+        }
+   }
+
+
+   var class1Sql = "SELECT COUNT(*) as count FROM class2 WHERE (";
+
+
+   if(whereSqlA != "") {
+        class1Sql += "dr1 in ("+whereSqlA+") or dr2 in ("+whereSqlA+")"
+   }
+
+      if(whereSqlB != "") {
+        if(whereSqlA != "") {
+            class1Sql+= " or "
+        }
+        class1Sql += "dq1 in ("+whereSqlB+") or dq2 in ("+whereSqlB+")"
+   }
+
+   class1Sql += ")";
+
+
+
+
+   sql = `SELECT 
+  (
+    ((
+    `+class1Sql+`) * 100) /
+    (SELECT COUNT(*) FROM class1)  ) as prac`;
+
+    connection.query(sql, (err, rows, fields) => {
+      if (err) throw err
+
+      res.send(rows[0].prac);
+    })
+
+
+   
+
+
+    connection.end()
+  //res.sendStatus(200).send(1)
+})
 
 module.exports = app;
