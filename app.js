@@ -57,12 +57,21 @@ app.post('/calculate', (req, res) => {
   let string = class1.split(" ");
   console.log(string)
 
+  const reA = new RegExp("^[A][0-9]{1,5}?$");
+  const reB = new RegExp("^[B][0-9]{1,5}?$");
+
+
   for (var i = 0; i < string.length; i++) {
-      if(string[i].charAt(0) == "A") {
+
+      if(string[i].match(reA)) {
         a.push(string[i].replace("A",""));
       }
 
-     if(string[i].charAt(0) == "B") {
+      /*if(string[i].charAt(0) == "A") {
+        a.push(string[i].replace("A",""));
+      }*/
+
+      if(string[i].match(reB)) {
         b.push(string[i].replace("B",""));
       }
   }
@@ -101,6 +110,12 @@ app.post('/calculate', (req, res) => {
    class1Sql += ")";
 
 
+   if (whereSqlA == "" && whereSqlB == "" ) {
+connection.end()
+ res.send("");
+return
+   }
+
 
 
    sql = `SELECT 
@@ -108,6 +123,8 @@ app.post('/calculate', (req, res) => {
     ((
     `+class1Sql+`) * 100) /
     (SELECT COUNT(*) FROM class1)  ) as prac`;
+
+    console.log(sql);
 
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err
@@ -146,12 +163,15 @@ app.post('/calculate2', (req, res) => {
   let string = class1.split(" ");
   console.log(string)
 
+  const reA = new RegExp("DR[0-9]{1,5}?$");
+  const reB = new RegExp("DQ[0-9]{1,5}?$");
+
   for (var i = 0; i < string.length; i++) {
-      if(string[i].charAt(1) == "R") {
+      if(string[i].match(reA)) {
         a.push(string[i].replace("DR",""));
       }
 
-     if(string[i].charAt(1) == "Q") {
+      if(string[i].match(reB)) {
         b.push(string[i].replace("DQ",""));
       }
   }
@@ -190,6 +210,12 @@ app.post('/calculate2', (req, res) => {
    class1Sql += ")";
 
 
+
+   if (whereSqlA == "" && whereSqlB == "" ) {
+connection.end()
+res.send("");
+return
+   }
 
 
    sql = `SELECT 
