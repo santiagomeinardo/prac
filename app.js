@@ -129,7 +129,7 @@ return
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err
 
-      res.send(rows[0].prac);
+      res.send(""+Math.ceil(rows[0].prac));
     })
 
 
@@ -227,7 +227,7 @@ return
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err
 
-      res.send(rows[0].prac);
+      res.send(""+Math.ceil(rows[0].prac));
     })
 
 
